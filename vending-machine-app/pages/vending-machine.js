@@ -46,7 +46,7 @@ const VendingMachine = () => {
   };
 
   const getMyDonutCountHandler = async () => {
-    const count = await vmContract.methods.donutBalances (address).call ();
+    const count = await vmContract.methods.donutBalances(address).call ();
     setMyDonutCount (count);
   };
 
