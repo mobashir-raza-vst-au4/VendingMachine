@@ -1,53 +1,53 @@
 import Head from 'next/head';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import styles from '../styles/Home.module.css';
 import vendingMachineContract from './../blockchain/vending';
 import Web3 from 'web3';
 
 const VendingMachine = () => {
-  const [inventory, setInventory] = useState ('');
-  const [myDonutCount, setMyDonutCount] = useState ('');
-  const [errorMsg, setErrorMsg] = useState ('');
-  const [successMsg, setSuccessMsg] = useState ('');
-  const [web3, setWeb3] = useState (null);
-  const [address, setAddress] = useState (null);
-  const [vmContract, setVmContract] = useState (null);
-  const [input, setInput] = useState (null);
-  const [purchases, setPurchases] = useState (0);
+  const [inventory, setInventory] = useState('');
+  const [myDonutCount, setMyDonutCount] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [web3, setWeb3] = useState(null);
+  const [address, setAddress] = useState(null);
+  const [vmContract, setVmContract] = useState(null);
+  const [input, setInput] = useState(null);
+  const [purchases, setPurchases] = useState(0);
 
   const connectWalletHandler = async () => {
     window.ethereum
       ? window.ethereum
-          .request ({method: 'eth_requestAccounts'})
-          .then (async accounts => {
-            console.log (accounts);
-            setAddress (accounts[0]);
-            let w3 = new Web3 (window.ethereum);
-            setWeb3 (w3);
+        .request({ method: 'eth_requestAccounts' })
+        .then(async accounts => {
+          console.log(accounts);
+          setAddress(accounts[0]);
+          let w3 = new Web3(window.ethereum);
+          setWeb3(w3);
 
-            //create local contract copy
-            const vm = vendingMachineContract(w3)
-            setVmContract(vm)
-          })
-          .catch (err => console.log (err))
-      : console.log ('Please install MetaMask');
+          //create local contract copy
+          const vm = vendingMachineContract(w3)
+          setVmContract(vm)
+        })
+        .catch(err => console.log(err))
+      : console.log('Please install MetaMask');
   };
 
-  useEffect (() => {
+  useEffect(() => {
     if (vmContract) getInventoryHandler();
     if (vmContract && address) getMyDonutCountHandler();
   }, [vmContract, address, purchases]);
 
   const getInventoryHandler = async () => {
     const inventory = await vmContract.methods
-      .getVendingMachineBalances ()
-      .call ();
-    setInventory (inventory);
+      .getVendingMachineBalances()
+      .call();
+    setInventory(inventory);
   };
 
   const getMyDonutCountHandler = async () => {
-    const count = await vmContract.methods.donutBalances(address).call ();
-    setMyDonutCount (count);
+    const count = await vmContract.methods.donutBalances(address).call();
+    setMyDonutCount(count);
   };
 
   const inputHandler = (e) => {
@@ -60,12 +60,12 @@ const VendingMachine = () => {
         from: address,
         value: web3.utils.toWei('0.02', 'ether') * input
       })
-      setPurchases(purchases+1)
+      setPurchases(purchases + 1)
       setSuccessMsg(`Successfully purchased ${input} donuts`)
     } catch (error) {
       setErrorMsg(error.message)
     }
-    
+
   };
 
   const resetMsg = () => {
@@ -123,7 +123,7 @@ const VendingMachine = () => {
             </label>
             <input
               onChange={e => {
-                inputHandler (e);
+                inputHandler(e);
               }}
               type="text"
               id="buy_donut"
